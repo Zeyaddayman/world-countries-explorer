@@ -1,8 +1,8 @@
-"use server"
-
+import { REGIONS } from "@/constants/regions";
 import prisma from "@/lib/prisma"
 import { Country } from "@prisma/client"
 import { unstable_cache as next_cache } from "next/cache"
+import { cache as react_cache } from "react";
 
 export async function getAllCountries(): Promise<Country[]> {
     return await prisma.country.findMany({
@@ -21,23 +21,24 @@ export async function getCountriesByRegion(region: Country["region"]): Promise<C
     // Captlize the region
     region = region.charAt(0).toUpperCase() + region.slice(1).toLowerCase()
 
+    if (!REGIONS.some(r => r.name === region)) {
+        throw new Error("Invalid region")
+    }
+
     if (region === "All") {
 
-        const countries = await next_cache(getAllCountries, ["all-countries"])()
+        const allCountries = await next_cache(getAllCountries, ["all-countries"])()
 
-        return countries
+        return allCountries
 
-    } else {
+    }
+    else {
 
         const countries = await next_cache(async (): Promise<Country[]> => {
 
             return await prisma.country.findMany({
-                where: {
-                    region
-                },
-                orderBy: {
-                    name: "asc"
-                }
+                where: { region },
+                orderBy: { name: "asc" }
             })
 
         }, [`${region}-countries`])()
@@ -46,10 +47,6 @@ export async function getCountriesByRegion(region: Country["region"]): Promise<C
     }
 }
 
-export async function getCountryById(id: Country["id"]): Promise<Country | null> {
-    return await prisma.country.findUnique({
-        where: {
-            id
-        }
-    })
-}
+export const getCountryById = react_cache(async (id: Country["id"]) => {
+    return await prisma.country.findUnique({ where: { id } })
+})

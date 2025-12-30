@@ -1,7 +1,7 @@
-import { getCountriesByRegion } from "./actions";
-import CountriesList from "./components/CountriesList";
-import Filters from "./components/Filters";
-import ScrollToTop from "./components/ScrollToTop";
+import { getCountriesByRegion } from "../server/db";
+import CountriesList from "../components/CountriesList";
+import Filters from "../components/Filters";
+import ScrollToTop from "../components/ScrollToTop";
 
 interface Props {
     searchParams: Promise<{ [key: string]: string }>

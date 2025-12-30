@@ -1,11 +1,7 @@
-import { getAllCountries, getCountryById } from "@/app/actions";
-import GobackBtn from "@/app/components/GobackBtn";
+import { getAllCountries, getCountryById } from "@/server/db";
+import GobackBtn from "@/components/GobackBtn";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { cache as react_cache } from "react";
-
-// insted of getting the country from the database twice (metadata, page), we will cache the result
-const getCachedCountry = react_cache(getCountryById)
 
 interface Props {
     params: Promise<{ id: string }>
@@ -16,13 +12,13 @@ export const dynamicParams = false
 export async function generateMetadata({ params }: Props) {
     const { id } = await params
 
-    const country = await getCachedCountry(id)
+    const country = await getCountryById(id)
 
     if (!country) return { title: 'Country Not Found' }
 
     return {
         title: `${country.name} - Country Information | World Countries Explorer`,
-        description: `Detailed information about ${country.name}`,
+        description: `Explore detailed information about ${country.name}, including population, capital, languages, and more on World Countries Explorer.`,
         openGraph: {
             images: [country.flags.png]
         }
@@ -31,7 +27,7 @@ export async function generateMetadata({ params }: Props) {
 
 const CountryPage = async ({ params }: Props) => {
     const { id } = await params
-    const country = await getCachedCountry(id)
+    const country = await getCountryById(id)
 
     if (!country) notFound()
 
@@ -52,7 +48,9 @@ const CountryPage = async ({ params }: Props) => {
                 <div className="flex-1">
                     <div className="flex flex-wrap gap-10 items-center [&_span]:text-secondary-text-color">
                         <div>
-                            <h1 className="country-name">{country.name}</h1>
+                            <h1 className="font-bold text-2xl md:text-3xl mb-4">
+                                {country.name}
+                            </h1>
                             <p>Native Name: <span>{country.nativeName}</span></p>
                             <p>Population: <span>{country.population.toLocaleString()}</span></p>
                             <p>Region: <span>{country.region}</span></p>

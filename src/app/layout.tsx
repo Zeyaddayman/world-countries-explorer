@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import { Nunito_Sans } from "next/font/google";
 import "./globals.css";
-import ThemeProvider from "./providers/ThemeProvider";
-import Header from "./components/Header";
+import ThemeProvider from "../providers/ThemeProvider";
+import Header from "../components/Header";
 
 const NunitoSans = Nunito_Sans({
   subsets: ["latin"],
-  weight: ["300", "600", "800"]
+  weight: ["400", "500", "600", "700"]
 })
 
 export const metadata: Metadata = {
