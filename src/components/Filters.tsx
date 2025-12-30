@@ -1,7 +1,20 @@
 "use client"
 
+import { REGIONS } from '@/constants/regions';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { IoSearchOutline } from 'react-icons/io5'
+
+const debouncedSearch = (cb: (query: string) => void, delay: number) => {
+
+    let timer: NodeJS.Timeout
+
+    return (query: string) => {
+        clearTimeout(timer)
+        timer = setTimeout(() => {
+            cb(query)
+        }, delay)
+    }
+}
 
 const Filters = () => {
 
@@ -9,26 +22,24 @@ const Filters = () => {
     const pathname = usePathname();
     const { replace } = useRouter()
 
-    const handleSearch = (query: string) => {
+    const handleSearch = debouncedSearch((query: string) => {
+
         const params = new URLSearchParams(searchParams)
 
-        if (!query) {
-            params.delete('query')
-        } else {
-            params.set('query', query)
-        }
+        if (!query) params.delete('query')
+        
+        else params.set('query', query)
 
         replace(`${pathname}?${params.toString()}`)
-    }
+
+    }, 600)
 
     const handleRegion = (region: string) => {
         const params = new URLSearchParams(searchParams)
 
-        if (region === 'all') {
-            params.delete('region')
-        } else {
-            params.set('region', region)
-        }
+        if (region === 'all') params.delete('region')
+        
+        else params.set('region', region)
 
         replace(`${pathname}?${params.toString()}`)
     }
@@ -59,12 +70,9 @@ const Filters = () => {
                     defaultValue={searchParams.get('region')?.toString().toLowerCase()}
                     onChange={(e) => handleRegion(e.target.value)}
                 >
-                    <option value={"all"}>All</option>
-                    <option value={"africa"}>Africa</option>
-                    <option value={"americas"}>Americas</option>
-                    <option value={"asia"}>Asia</option>
-                    <option value={"europe"}>Europe</option>
-                    <option value={"oceania"}>Oceania</option>
+                    {REGIONS.map((region) => (
+                        <option key={region.value} value={region.value}>{region.name}</option>
+                    ))}
                 </select>
             </div>
         </div>
