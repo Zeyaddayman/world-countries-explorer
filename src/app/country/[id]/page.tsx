@@ -44,6 +44,7 @@ const CountryPage = async ({ params }: Props) => {
                     height={300}
                     className="rounded"
                     priority
+                    fetchPriority="high"
                 />
                 <div className="flex-1">
                     <div className="flex flex-wrap gap-10 items-center [&_span]:text-secondary-text-color">
